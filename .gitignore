@@ -1,3 +1,6 @@
+#tailwind css
+frontend/src/index.output.css
+
 # Logs
 logs
 *.log

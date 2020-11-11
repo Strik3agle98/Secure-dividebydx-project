@@ -1,0 +1,79 @@
+.app {
+  height: 100vh;
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.ant-popover-inner,
+.ant-modal-content,
+.ant-modal-header {
+  background-color: #141414;
+  border: 1px solid #303030;
+}
+
+.ant-modal-footer,
+.ant-modal-header {
+  border: none;
+}
+
+.ant-popover-inner .ant-popover-message,
+.ant-modal-title {
+  color: #fff;
+}
+
+.ant-popover-buttons button {
+  color: #6e6e6e;
+}
+
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
+  background: #fff;
+  border-color: #303030;
+}
+
+.ant-list-item-meta-description {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.ant-divider {
+  border: 1px solid #303030;
+}
+
+.ant-comment-actions > li > span {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ant-input-prefix {
+  margin-right: 24px;
+  margin-left: 8px;
+}
+
+.ant-btn > span :hover {
+  color: black;
+}
+
+.ant-btn > span {
+  color: #6e6e6e !important;
+}
+
+#logo {
+  font-family: "IBM Plex Sans", sans-serif;
+  color: #fff;
+}
+
+.postbook-frame {
+  border: 1px solid #303030;
+}
+
+.ant-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+}

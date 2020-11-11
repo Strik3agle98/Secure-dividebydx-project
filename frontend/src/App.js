@@ -1,8 +1,12 @@
 import React from "react";
-import Login from "./pages/Login"
+import Login from "./pages/Login";
+import Feed from "./pages/Feed";
+import "./App.css";
 
 export default function App() {
   return (
-    <Login />
+    <div className="app">
+      <Login />
+    </div>
   );
 }

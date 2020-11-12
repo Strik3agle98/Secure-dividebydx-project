@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Login() {
+  const [userCred, setUserCred] = useState({
+    username: "",
+    password: "",
+  });
+
+  const [captcha, setCaptcha] = useState("");
+
+  const onChange = (field) => (e) => {
+    e.target
+      ? setUserCred({
+          ...userCred,
+          [field]: e.target.value,
+        })
+      : setCaptcha(e);
+  };
+
+  useEffect(() => {
+    console.log(userCred);
+    console.log(captcha);
+  });
+
   return (
     <Row id="login-page" className="h-full">
       <Col span={12} className="h-full flex flex-row items-center">
@@ -66,12 +88,18 @@ export default function Login() {
             placeholder="Enter your username"
             prefix={<UserOutlined />}
             className="mb-12"
+            onChange={onChange("username")}
           />
           <Input
             size="large"
             placeholder="Enter your password"
             prefix={<LockOutlined />}
             className="mb-3"
+            onChange={onChange("password")}
+          />
+          <ReCAPTCHA
+            sitekey="6LcqAeIZAAAAAIcklWRbpT0gp6SqWdE_6y7shLxp"
+            onChange={onChange("captcha")}
           />
           <div
             className="flex mb-16"

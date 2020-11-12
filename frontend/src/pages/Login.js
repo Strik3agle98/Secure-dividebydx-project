@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import ReCAPTCHA from "react-google-recaptcha";
+import { loginAPI } from "../api";
+import { externalEndpoint } from "../const";
 
 export default function Login() {
   const [userCred, setUserCred] = useState({
@@ -30,7 +32,9 @@ export default function Login() {
       return;
     }
 
-    console.log("success!");
+    loginAPI(externalEndpoint)(userCred)
+      .then(() => console.log("loguine!"))
+      .catch(() => alert("user doesn't exist!"));
   };
 
   useEffect(() => {

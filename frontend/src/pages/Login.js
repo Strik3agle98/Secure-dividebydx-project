@@ -20,6 +20,19 @@ export default function Login() {
       : setCaptcha(e);
   };
 
+  const handleSubmit = () => {
+    if (userCred.username.length === 0 || userCred.password.length === 0) {
+      alert("Form can't be empty");
+      return;
+    }
+    if (captcha.length === 0) {
+      alert("captcha not done");
+      return;
+    }
+
+    console.log("success!");
+  };
+
   useEffect(() => {
     console.log(userCred);
     console.log(captcha);
@@ -108,7 +121,7 @@ export default function Login() {
             <p className="mr-auto">Do you forget a password?</p>
             <p>Nothing to do here</p>
           </div>
-          <Button size="large" htmlType="submit">
+          <Button size="large" htmlType="submit" onClick={handleSubmit}>
             SIGN IN
           </Button>
         </div>

@@ -1,50 +1,80 @@
+// insert token after login here
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmFmYWUyMTFhMDViOTQ5YjcwZjU3YzEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MDUzNDk5MDksImV4cCI6MTYwODk0OTkwOX0.01reBa3UddfV5XqcHcx-hW-2KV4kMi6t6d9jaT1ZfWE
+@ctype = application/json
+###
 http://localhost:3000
 
 ###
-http://localhost:3000/login
+
+POST http://localhost:3000/api/login
+Content-Type: {{ctype}}
+
+{
+    "username": "rod41732",
+    "password": "12345678"
+}
 
 ###
-http://localhost:3000/dev/register
+POST http://localhost:3000/api/dev/register
+Content-Type: {{ctype}}
 
-
-###
-http://localhost:3000/user/:userId
-
-
-###
-http://localhost:3000/post
-
-
-###
-http://localhost:3000/post/:postId
-
+{
+    "username": "rod41732",
+    "password": "12345678",
+    "displayName": "Rodchananat",
+    "role": "admin"
+}
 
 ###
-http://localhost:3000/post
+GET http://localhost:3000/api/user/5fafae211a05b949b70f57c1
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
 
-
-###
-http://localhost:3000/post/:postId
-
-
-###
-http://localhost:3000/post/:postId
 
 
 ###
-http://localhost:3000/post/:postId/comment
+GET http://localhost:3000/api/post
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
 
 
 ###
-http://localhost:3000/post/:postId/comment
+http://localhost:3000/api/post/:postId
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
 
 
 ###
-http://localhost:3000/comment/:commentId
+POST http://localhost:3000/api/post
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
+
+{
+    "content": "hello world"
+}
+
+###
+http://localhost:3000/api/post/:postId
 
 
 ###
-http://localhost:3000/comment/:commentId
+http://localhost:3000/api/post/:postId
+
+
+###
+http://localhost:3000/api/post/:postId/comment
+
+
+###
+http://localhost:3000/api/post/:postId/comment
+
+
+###
+http://localhost:3000/api/comment/:commentId
+
+
+###
+http://localhost:3000/api/comment/:commentId
 
 
 ###

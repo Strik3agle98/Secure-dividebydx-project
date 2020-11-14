@@ -33,7 +33,7 @@ const authMw = (
   const token = authHeader.substring(7);
   try {
     const payload = VerifyJwtUseCase.execute(token);
-    res.locals.user = payload;
+    res.locals.userId = payload;
     next();
   } catch (err) {
     return res.status(401).send({ status: "Invalid Token" });
@@ -132,11 +132,13 @@ rootRouter.post("/dev/register", async (req, res) => {
   }
 });
 
-rootRouter.get("/user/:userId", async (req, res) => {
+rootRouter.get("/user/:userId", authMw, async (req, res) => {
   const { userId } = req.params;
   try {
     const user = await GetUserByIdUseCase.execute(userId);
-    return res.status(200).send({ user: user });
+
+
+    return res.status(200).send({ user: user.toJSON() });
   } catch (err) {
     console.error("Error creating", err);
     return res.status(500).send({ status: "Error" });
@@ -162,6 +164,7 @@ rootRouter.get("/post/:postId", async (req, res) => {
 rootRouter.post("/post", authMw, async (req, res) => {
   const { userId } = res.locals;
   const { content } = req.body;
+  console.log({userId, content});
   if (!content) return res.status(400).send({ status: "No content specified" });
   const post = await CreatePostUseCase.execute(content, userId);
   return res.status(200).send({ post });

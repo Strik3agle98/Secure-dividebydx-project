@@ -6,8 +6,8 @@ import { UserDoc } from "./user";
 export interface Comment {
   content: string;
   timestamp: Date;
-  user: Types.ObjectId | Map<String, any>;
-  post: Types.ObjectId | Map<String, any>;
+  user: Types.ObjectId | UserDoc;
+  post: Types.ObjectId | PostDoc;
 }
 
 // for method
@@ -18,7 +18,7 @@ export interface CommentDoc extends CommentDocBase {
   post: PostDoc["_id"];
 }
 
-export interface PopulatedCommentDoc {
+export interface PopulatedCommentDoc extends CommentDocBase {
   user: UserDoc;
   post: PostDoc;
 }
@@ -33,11 +33,13 @@ const commentSchema = new Schema({
     required: true,
   },
   user: {
-    type: Types.ObjectId,
+    type: Schema.Types.ObjectId,
+    required: true,
     ref: "User",
   },
   post: {
-    type: Types.ObjectId,
+    type: Schema.Types.ObjectId,
+    required: true,
     ref: "Post",
   },
 });

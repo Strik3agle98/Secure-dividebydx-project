@@ -9,32 +9,41 @@ export interface User {
 }
 
 // for method
-export interface UserDoc extends User, Document {}
+export interface UserDoc extends User, Document { }
 
 const UserSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+  _id: Schema.Types.ObjectId,
   username: {
-    type: Schema.Types.String,
+    type: String,
     unique: true,
     required: true,
   },
-  password: Schema.Types.String,
+  password: String,
   displayName: {
-    type: Schema.Types.String,
+    type: String,
     required: true,
   },
   role: {
-    type: Schema.Types.String,
+    type: String,
     enum: ["admin", "user"],
   },
 });
 
-UserSchema.pre<UserDoc>("save", async function (next) {
-  if (this.isModified() || this.isNew) {
-    this.password = await hash(this.password, 8);
-  }
-  next();
-});
+// UserSchema.pre<UserDoc>("save", async function (next) {
+//   console.log("pre save check ???")
+//   if (this.isModified() || this.isNew) {
+//     this.password = await hash(this.password, 8);
+//     console.log("--> hash")
+//   }
+//   next();
+// });
+
+// UserSchema.pre<UserDoc>("insertMany", async function (next) {
+//   console.log(this);
+//   this.password = await hash(this.password, 8);
+//   next();
+// });
+
 
 UserSchema.statics.findByUsernameAndPassword = async function (
   username: string,

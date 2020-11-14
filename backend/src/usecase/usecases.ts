@@ -2,9 +2,10 @@ import { JsonWebTokenError } from "jsonwebtoken";
 import UserDb, { User, UserDoc, UserModel } from "../models/user";
 import jwt from "jsonwebtoken";
 import config from "../config/config";
-import PostDb, { PostDoc } from "../models/post";
+import PostDb, { PopulatedPostDoc, PostDoc } from "../models/post";
 import Mongoose, { Types } from "mongoose";
-import CommentDb, { CommentDoc, Comment } from "../models/comment";
+import CommentDb, { CommentDoc, Comment, PopulatedCommentDoc } from "../models/comment";
+import { hash } from "bcrypt";
 // Auth
 export class LoginUseCase {
   static async execute(username: string, password: string): Promise<UserDoc> {
@@ -44,6 +45,7 @@ export class VerifyJwtUseCase {
 export class RegisterUseCase {
   static async execute(user: User): Promise<void> {
     // TODO: actually this should validate ?
+    user.password = await hash(user.password, 8);
     await UserDb.insertMany(user);
     return;
   }
@@ -51,32 +53,35 @@ export class RegisterUseCase {
 // User
 export class GetUserByIdUseCase {
   static async execute(userId: string): Promise<UserDoc> {
-    const user = await UserDb.findById(userId);
+    const user = await UserDb.findOne({_id: userId}, {password: 0});
     if (!user) throw new Error("User not found");
-    return user;
+
+    return user.toObject();
   }
 }
 
 // Post
 export class GetPostByIdUseCase {
-  static async execute(postId: string): Promise<PostDoc | undefined> {
-    return (await PostDb.findById(postId)) ?? undefined;
+  static async execute(postId: string): Promise<PopulatedPostDoc | undefined> {
+    const result = (await PostDb.findById(postId).populate('user').populate('comments'));
+    return result ?? undefined;
   }
 }
 
 export class GetAllPostsUseCase {
   static async execute() {
-    return await PostDb.find();
+    return await PostDb.find().populate('user').populate('comments');
   }
 }
 
 export class CreatePostUseCase {
-  static async execute(content: string, userId: string): Promise<PostDoc> {
+  static async execute(content: string, userId: string): Promise<PopulatedPostDoc> {
     const post = await PostDb.insertMany({
       content,
-      user: new Types.ObjectId(userId),
+      user: userId,
+      timestamp: new Date(),
     });
-    return post;
+    return await post.populate('user').populate('comments');
   }
 }
 
@@ -85,6 +90,7 @@ export class EditPostUsecase {
     const oldPost = await PostDb.findById(postId);
     if (!oldPost) throw new Error("Post not found");
     oldPost.content = newContent;
+    oldPost.timestamp = new Date();
     await oldPost.save();
   }
 }
@@ -113,8 +119,8 @@ export class ValidatePostPermissionUsecase {
 
 // comment
 export class GetPostCommentsUseCase {
-  static async execute(postId: string): Promise<CommentDoc[]> {
-    const comments = await CommentDb.find({ post: postId });
+  static async execute(postId: string): Promise<PopulatedCommentDoc[]> {
+    const comments = await CommentDb.find({ post: postId }).populate('user');
     return comments;
   }
 }
@@ -132,6 +138,7 @@ export class AddCommentToPostUseCase {
       post: new Mongoose.Types.ObjectId(postId),
       user: new Mongoose.Types.ObjectId(userId),
       content,
+      timestamp: new Date(),
     };
     const commentDoc = await CommentDb.insertMany(newComment);
 
@@ -147,6 +154,7 @@ export class EditCommentUsecase {
     const oldComment = await CommentDb.findById(commentId);
     if (!oldComment) throw new Error("Comment not found");
     oldComment.content = newContent;
+    // dont update time cause dont wanna break comment order
     await oldComment.save();
   }
 }

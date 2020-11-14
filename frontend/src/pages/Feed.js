@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Input, Divider } from "antd";
 import { FontSizeOutlined } from "@ant-design/icons";
 import SimpleBar from "simplebar-react";
 import CommentContent from "../components/CommentContent";
 import "simplebar/dist/simplebar.min.css";
+import { postAPI, getPostAPI } from "../api";
+import { externalEndpoint } from "../const";
 
 const PostContent = () => {
   return (
@@ -66,6 +68,14 @@ const PostContent = () => {
 };
 
 export default function Feed() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    getPostAPI(externalEndpoint).then((response) => {
+      setPosts(response);
+    });
+  }, []);
+
   return (
     <Row className="h-full">
       <Col span={8} className="h-full flex flex-row items-center">

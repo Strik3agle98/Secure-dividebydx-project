@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Input, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import ReCAPTCHA from "react-google-recaptcha";
-import { loginAPI } from "../api";
+import { loginAPI, whoamiAPI } from "../api";
 import { externalEndpoint } from "../const";
 
-export default function Login() {
+export default ({ setSession }) => {
   const [userCred, setUserCred] = useState({
     username: "",
     password: "",
@@ -33,7 +33,15 @@ export default function Login() {
     }
 
     loginAPI(externalEndpoint)(userCred)
-      .then(() => console.log("loguine!"))
+      .then(() => {
+        whoamiAPI(externalEndpoint).then((response) => {
+          setSession({
+            authenticated: true,
+            userId: response.userId,
+            displayName: response.displayName,
+          });
+        });
+      })
       .catch(() => alert("user doesn't exist!"));
   };
 
@@ -132,4 +140,4 @@ export default function Login() {
       </Col>
     </Row>
   );
-}
+};

@@ -1,6 +1,17 @@
 // insert token after login here
+
+// ========== token
+// admin
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmFmYWUyMTFhMDViOTQ5YjcwZjU3YzEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MDUzNDk5MDksImV4cCI6MTYwODk0OTkwOX0.01reBa3UddfV5XqcHcx-hW-2KV4kMi6t6d9jaT1ZfWE
+// user
+# @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZmFmYjkzZDNjMjA4NDYxZjBlMmRiNWUiLCJyb2xlIjoidXNlciIsImlhdCI6MTYwNTM1MjE1NywiZXhwIjoxNjA4OTUyMTU3fQ.EaBTsBmhOaNDX90o2TedeHpi-jg1S2jlsCFfzpMT6R4
 @ctype = application/json
+
+// please change post id
+@post1= 5fafb6c2261e405f987d4994
+@post2= 5fafb6f137abec5fc02f8ab4
+
+
 ###
 http://localhost:3000
 
@@ -10,7 +21,7 @@ POST http://localhost:3000/api/login
 Content-Type: {{ctype}}
 
 {
-    "username": "rod41732",
+    "username": "rod41733",
     "password": "12345678"
 }
 
@@ -19,10 +30,10 @@ POST http://localhost:3000/api/dev/register
 Content-Type: {{ctype}}
 
 {
-    "username": "rod41732",
+    "username": "rod41733",
     "password": "12345678",
     "displayName": "Rodchananat",
-    "role": "admin"
+    "role": "user"
 }
 
 ###
@@ -39,7 +50,7 @@ Authorization: Bearer {{token}}
 
 
 ###
-http://localhost:3000/api/post/:postId
+GET http://localhost:3000/api/post/{{post1}}
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
@@ -54,27 +65,55 @@ Authorization: Bearer {{token}}
 }
 
 ###
-http://localhost:3000/api/post/:postId
+POST http://localhost:3000/api/post/{{post1}}
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
+
+{
+    "content": "hello world2"
+}
 
 
 ###
-http://localhost:3000/api/post/:postId
+DELETE http://localhost:3000/api/post/{{post1}}
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
 
-
-###
-http://localhost:3000/api/post/:postId/comment
-
-
-###
-http://localhost:3000/api/post/:postId/comment
 
 
 ###
-http://localhost:3000/api/comment/:commentId
+GET http://localhost:3000/api/post/{{post1}}/comment
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
 
 
 ###
-http://localhost:3000/api/comment/:commentId
+POST http://localhost:3000/api/post/{{post1}}/comment
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
+
+{
+    "content": "Road admin comment"
+}
+
+// please chang comment id
+@commentadmin = 5fafbc8521756b65f1d705c1
+@commentuser = 5fafbc3d21756b65f1d705be
+
+###
+POST http://localhost:3000/api/comment/{{commentadmin}}
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
+
+{
+    "content": "New content"
+}
+
+
+###
+DELETE http://localhost:3000/api/comment/{{commentadmin}}
+Content-Type: {{ctype}}
+Authorization: Bearer {{token}}
 
 
 ###

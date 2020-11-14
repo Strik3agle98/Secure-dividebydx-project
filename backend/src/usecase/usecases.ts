@@ -108,13 +108,14 @@ export class ValidatePostPermissionUsecase {
   static async execute(postId: string, userId: string) {
     const post = await PostDb.findById(postId);
     if (!post) throw new Error("invalid Post");
-    console.log("[validate.post]", post);
+    console.log("[validate.post]", post._id);
     // same user = ok
     if (post.user.toString() == userId) return true;
     // else check admin
     const user = await UserDb.findById(userId);
     if (!user) throw new Error("invalid User");
-    console.log("[validate.user]", user);
+    console.log("[validate.user]", user._id, user.role);
+    console.log("result", user.role === 'admin')
     return user.role === "admin";
   }
 }
@@ -183,15 +184,14 @@ export class DeleteCommentUsecase {
 
 export class ValidateCommentPermissionUseCase {
   static async execute(commentId: string, userId: string) {
+    console.log({commentId, userId})
     const comment = await CommentDb.findById(commentId);
     if (!comment) throw new Error("invalid Comment");
-    console.log("[validate.post]", comment);
     // same user = ok
     if (comment.user.toString() == userId) return true;
     // else check admin
     const user = await UserDb.findById(userId);
     if (!user) throw new Error("invalid User");
-    console.log("[validate.user]", user);
     return user.role === "admin";
   }
 }

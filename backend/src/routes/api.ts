@@ -62,36 +62,37 @@ const commentIdMw = (paramName: string) => (
     next();
 };
 
-const checkPostMw = (
+const checkPostMw = async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
 ) => {
     const { postId, user: { userId } } = res.locals;
     try {
-        const ok = ValidatePostPermissionUsecase.execute(postId, userId);
-        if (!ok) throw new Error(`Forbidden access user ${userId} post ${postId}`);
+        const ok = await ValidatePostPermissionUsecase.execute(postId, userId);
+        if (!ok)
+            throw new Error(`Forbidden access user ${userId} post ${postId}`);
         next();
     } catch (err) {
         console.error("postIdMiddleware", err);
-        return res.status(403).send({ status: "Forbidden" });
+        return res.status(403).send({ status: "Forbidden or not found" });
     }
 };
 
-const checkCommentMw = (
+const checkCommentMw = async (
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
 ) => {
-    const { postId: commentId, user: { userId } } = res.locals;
+    const { commentId, user: { userId } } = res.locals;
     try {
-        const ok = ValidateCommentPermissionUseCase.execute(commentId, userId);
+        const ok = await ValidateCommentPermissionUseCase.execute(commentId, userId);
         if (!ok)
             throw new Error(`Forbidden access user ${userId} comment ${commentId}`);
         next();
     } catch (err) {
         console.error("commentIdMiddleware", err);
-        return res.status(403).send({ status: "Forbidden" });
+        return res.status(403).send({ status: "Forbidden or not found" });
     }
 };
 
@@ -140,7 +141,7 @@ rootRouter.get("/user/:userId", authMw, async (req, res) => {
         const user = await GetUserByIdUseCase.execute(userId);
 
 
-        return res.status(200).send({ user: user.toJSON() });
+        return res.status(200).send({ user: user });
     } catch (err) {
         console.error("Error creating", err);
         return res.status(500).send({ status: "Error" });
@@ -219,6 +220,8 @@ rootRouter.post(
     async (req, res) => {
         const { content } = req.body;
         const { postId, user: { userId } } = res.locals;
+        if (!content) return res.status(400).send({status: "No content specified"});
+
         const comment = await AddCommentToPostUseCase.execute(
             postId,
             userId,

@@ -82,7 +82,7 @@ export class CreatePostUseCase {
       timestamp: new Date(),
       comments: [],
     };
-    const post = (await PostDb.insertMany([]))[0];
+    const post = (await PostDb.insertMany([newPost]))[0];
     return await post.populate('user').populate('comments');
   }
 }

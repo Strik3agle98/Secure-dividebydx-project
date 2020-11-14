@@ -2,7 +2,7 @@ import { JsonWebTokenError } from "jsonwebtoken";
 import UserDb, { User, UserDoc, UserModel } from "../models/user";
 import jwt from "jsonwebtoken";
 import config from "../config/config";
-import PostDb, { PopulatedPostDoc, PostDoc } from "../models/post";
+import PostDb, { PopulatedPostDoc, PostDoc, Post } from "../models/post";
 import Mongoose, { Types } from "mongoose";
 import CommentDb, { CommentDoc, Comment, PopulatedCommentDoc } from "../models/comment";
 import { hash } from "bcrypt";
@@ -76,11 +76,13 @@ export class GetAllPostsUseCase {
 
 export class CreatePostUseCase {
   static async execute(content: string, userId: string): Promise<PopulatedPostDoc> {
-    const post = await PostDb.insertMany({
+    const newPost: Post = {
       content,
-      user: userId,
+      user: new Mongoose.Types.ObjectId(userId),
       timestamp: new Date(),
-    });
+      comments: [],
+    };
+    const post = (await PostDb.insertMany([]))[0];
     return await post.populate('user').populate('comments');
   }
 }
@@ -140,7 +142,7 @@ export class AddCommentToPostUseCase {
       content,
       timestamp: new Date(),
     };
-    const commentDoc = await CommentDb.insertMany(newComment);
+    const commentDoc = (await CommentDb.insertMany([newComment]))[0];
 
     post.comments.push(commentDoc._id);
     await post.save();

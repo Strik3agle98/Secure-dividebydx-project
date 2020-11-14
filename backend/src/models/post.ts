@@ -2,7 +2,7 @@ import Mongoose, { Model, Schema, Types, Document, SchemaType } from "mongoose";
 import { CommentDoc } from "./comment";
 import { UserDoc } from "./user";
 
-interface Post {
+export interface Post {
   content: string;
   timestamp: Date;
   user: Types.ObjectId | UserDoc;

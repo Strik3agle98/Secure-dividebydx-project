@@ -1,1 +1,1 @@
-export const externalEndpoint = "http://localhost:8080";
+export const externalEndpoint = "http://localhost:3000";

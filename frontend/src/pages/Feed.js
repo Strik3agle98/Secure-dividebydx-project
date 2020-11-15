@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { Row, Col, Input, Divider } from "antd";
 import { FontSizeOutlined } from "@ant-design/icons";
 import SimpleBar from "simplebar-react";
@@ -6,6 +6,24 @@ import CommentContent from "../components/CommentContent";
 import "simplebar/dist/simplebar.min.css";
 import { postAPI, getPostAPI } from "../api";
 import { externalEndpoint } from "../const";
+
+const Post = ({ post, setPosts }) => {
+  return (
+    <Fragment>
+      <CommentContent
+        canReply={true}
+        username={post.user.displayName}
+        content={post.content}
+        // onReply={}
+        // onEdit={}
+        // onDelete={}
+      />
+      {post.comment.map((comment) => {
+        return <CommentContent />;
+      })}
+    </Fragment>
+  );
+};
 
 const PostContent = () => {
   return (
@@ -67,12 +85,14 @@ const PostContent = () => {
   );
 };
 
-export default function Feed() {
+export default ({ session }) => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    getPostAPI(externalEndpoint).then((response) => {
-      setPosts(response);
+    console.log(session);
+    getPostAPI(externalEndpoint)(session.token).then((response) => {
+      setPosts(response.data.posts);
+      console.log(response.data.posts);
     });
   }, []);
 
@@ -145,4 +165,4 @@ export default function Feed() {
       </Col>
     </Row>
   );
-}
+};

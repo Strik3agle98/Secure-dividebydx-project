@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Input, Button } from "antd";
+import { Row, Col, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import ReCAPTCHA from "react-google-recaptcha";
-import { loginAPI, whoamiAPI } from "../api";
+import { loginAPI, registerAPI, getUserAPI } from "../api";
 import { externalEndpoint } from "../const";
 
 export default ({ setSession }) => {
@@ -10,6 +10,15 @@ export default ({ setSession }) => {
     username: "",
     password: "",
   });
+
+  const [register, setRegister] = useState({
+    username: "",
+    password: "",
+    displayName: "",
+    role: "user",
+  });
+
+  const [checked, setChecked] = useState(false);
 
   const [captcha, setCaptcha] = useState("");
 
@@ -22,6 +31,14 @@ export default ({ setSession }) => {
       : setCaptcha(e);
   };
 
+  const onChangeReg = (field) => (e) => {
+    e.target
+      ? setRegister({
+          ...register,
+          [field]: e.target.value,
+        })
+      : setCaptcha(e);
+  };
   const handleSubmit = () => {
     if (userCred.username.length === 0 || userCred.password.length === 0) {
       alert("Form can't be empty");
@@ -33,14 +50,50 @@ export default ({ setSession }) => {
     }
 
     loginAPI(externalEndpoint)(userCred)
+      .then((response) => {
+        console.log(response);
+        const payload = JSON.parse(atob(response.data.token.split(".")[1]));
+        const { userId } = payload;
+        console.log(userId);
+        getUserAPI(externalEndpoint)(userId)(response.data.token).then(
+          (response2) => {
+            console.log(response2);
+            setSession({
+              authenticated: true,
+              user: response2.data.user,
+              token: response.data.token,
+            });
+          }
+        );
+
+        // setSession({
+        //   token: response.data.token,
+
+        // })
+      })
+      .catch(() => alert("user doesn't exist!"));
+  };
+
+  const handleRegister = () => {
+    const passw = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,100}$/;
+    if (userCred.username.length === 0 || userCred.password.length === 0) {
+      alert("Form can't be empty");
+      return;
+    }
+    if (captcha.length === 0) {
+      alert("captcha not done");
+      return;
+    }
+    if (!userCred.password.match(passw)) {
+      alert(
+        "password must contain capital letter, normal letter, number and longer than 8 characters."
+      );
+      return;
+    }
+
+    registerAPI(externalEndpoint)(register)
       .then(() => {
-        whoamiAPI(externalEndpoint).then((response) => {
-          setSession({
-            authenticated: true,
-            userId: response.userId,
-            displayName: response.displayName,
-          });
-        });
+        alert("register success!!");
       })
       .catch(() => alert("user doesn't exist!"));
   };
@@ -48,6 +101,7 @@ export default ({ setSession }) => {
   useEffect(() => {
     console.log(userCred);
     console.log(captcha);
+    console.log(register);
   });
 
   return (
@@ -57,39 +111,69 @@ export default ({ setSession }) => {
           <h1 id="logo" className="text-5xl mb-16">
             POSTBOOK
           </h1>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-            culpa qui officia deserunt mollit anim id est laborum.
+          <div className="postbook-frame w-4/6 px-16 pb-12 ml-auto mr-40">
+            <h2
+              className="text-xl px-2 mb-12"
+              style={{
+                position: "relative",
+                top: "-16px",
+                left: "-8px",
+                background: "#141414",
+                width: "fit-content",
+              }}
+            >
+              REGISTER
+            </h2>
+
+            {/* TO DO Sign in handler */}
+            <Input
+              size="large"
+              placeholder="Enter your username"
+              prefix={<UserOutlined />}
+              className="mb-12"
+              onChange={onChangeReg("username")}
+            />
+            <Input
+              size="large"
+              placeholder="Enter your password"
+              prefix={<LockOutlined />}
+              className="mb-12"
+              onChange={onChangeReg("password")}
+            />
+            <Input
+              size="large"
+              placeholder="Enter your Display Name"
+              prefix={<UserOutlined />}
+              className="mb-3"
+              onChange={onChangeReg("displayName")}
+            />
+            <Checkbox
+              style={{ color: "rgb(255 255 255 / 40%)" }}
+              value={checked}
+              onChange={(e) => {
+                setChecked(e.target.checked);
+                e.target.checked
+                  ? setRegister({
+                      ...register,
+                      role: "admin",
+                    })
+                  : setRegister({
+                      ...register,
+                      role: "user",
+                    });
+              }}
+            >
+              Register as Admin ?
+            </Checkbox>
+            <ReCAPTCHA
+              sitekey="6LcqAeIZAAAAAIcklWRbpT0gp6SqWdE_6y7shLxp"
+              onChange={onChange("captcha")}
+            />
             <br />
-            <br />
-            Imperdiet dui accumsan sit amet nulla facilisi morbi tempus. Eget
-            nunc scelerisque viverra mauris in aliquam sem fringilla ut. Cursus
-            risus at ultrices mi tempus imperdiet nulla malesuada. Fermentum
-            odio eu feugiat pretium nibh ipsum consequat nisl. Cursus risus at
-            ultrices mi tempus imperdiet. Turpis egestas integer eget aliquet
-            nibh praesent tristique magna. Mattis rhoncus urna neque viverra
-            justo nec. Sed enim ut sem viverra aliquet eget sit. Nullam eget
-            felis eget nunc lobortis. In iaculis nunc sed augue lacus viverra
-            vitae congue eu.
-            <br />
-            <br />
-            Eget sit amet tellus cras adipiscing enim. Vel facilisis volutpat
-            est velit egestas dui id ornare arcu. Porta nibh venenatis cras sed
-            felis eget velit aliquet sagittis. Nec dui nunc mattis enim ut
-            tellus elementum sagittis vitae. Sed lectus vestibulum mattis
-            ullamcorper velit sed ullamcorper morbi. Sed euismod nisi porta
-            lorem mollis aliquam ut porttitor leo. Facilisi etiam dignissim diam
-            quis. Est ullamcorper eget nulla facilisi. Viverra accumsan in nisl
-            nisi. Elit scelerisque mauris pellentesque pulvinar.
-            <br />
-            <br />
-            <br />© 2020 omne ius per Bankbiz disposito
-          </p>
+            <Button size="large" htmlType="submit" onClick={handleRegister}>
+              REGISTER
+            </Button>
+          </div>
         </div>
       </Col>
       <Col span={12} className="h-full flex flex-row items-center">
@@ -104,7 +188,7 @@ export default ({ setSession }) => {
               width: "fit-content",
             }}
           >
-            ET IN KEY SIGNUM
+            SIGN IN
           </h2>
 
           {/* TO DO Sign in handler */}

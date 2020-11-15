@@ -99,9 +99,9 @@ export default ({ setSession }) => {
   };
 
   useEffect(() => {
-    console.log(userCred);
-    console.log(captcha);
-    console.log(register);
+    // console.log(userCred);
+    // console.log(captcha);
+    // console.log(register);
   });
 
   return (

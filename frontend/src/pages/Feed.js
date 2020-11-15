@@ -4,85 +4,105 @@ import { FontSizeOutlined } from "@ant-design/icons";
 import SimpleBar from "simplebar-react";
 import CommentContent from "../components/CommentContent";
 import "simplebar/dist/simplebar.min.css";
-import { postAPI, getPostAPI } from "../api";
+import {
+  postAPI,
+  getPostAPI,
+  commentAPI,
+  deleteAPI,
+  editAPI,
+  getCommentAPI,
+  editCommentAPI,
+  deleteCommentAPI,
+} from "../api";
 import { externalEndpoint } from "../const";
 
-const Post = ({ post, setPosts }) => {
+const Post = ({ post, setPosts, session }) => {
+  const [comments, setComments] = useState([]);
+  const onReply = (content, setShowModalAddComment) => (e) => {
+    commentAPI(externalEndpoint)(post._id)(content)(session.token).then(() => {
+      getPostAPI(externalEndpoint)(session.token).then((response) => {
+        setPosts(response.data.posts);
+        setShowModalAddComment(false);
+      });
+    });
+  };
+
+  const onDelete = (e) => {
+    deleteAPI(externalEndpoint)(post._id)(session.token).then(() => {
+      getPostAPI(externalEndpoint)(session.token).then((response) => {
+        setPosts(response.data.posts);
+      });
+    });
+  };
+
+  const onDeleteComment = (id) => (e) => {
+    deleteCommentAPI(externalEndpoint)(id)(session.token).then(() => {
+      getPostAPI(externalEndpoint)(session.token).then((response) => {
+        setPosts(response.data.posts);
+      });
+    });
+  };
+
+  const onEdit = (content, setShowModalEditComment) => (e) => {
+    editAPI(externalEndpoint)(post._id)(content)(session.token).then(() => {
+      getPostAPI(externalEndpoint)(session.token).then((response) => {
+        setPosts(response.data.posts);
+        setShowModalEditComment(false);
+      });
+    });
+  };
+
+  const onEditComment = (id) => (content, setShowModalEditComment) => (e) => {
+    editCommentAPI(externalEndpoint)(id)(content)(session.token).then(() => {
+      getPostAPI(externalEndpoint)(session.token).then((response) => {
+        setPosts(response.data.posts);
+        setShowModalEditComment(false);
+      });
+    });
+  };
+
+  useEffect(() => {
+    getCommentAPI(externalEndpoint)(post._id)(session.token).then(
+      (response) => {
+        setComments(response.data.comments);
+      }
+    );
+  }, [post]);
+
   return (
     <Fragment>
       <CommentContent
+        isAdmin={
+          session.user.role === "admin" || session.user._id === post.user._id
+        }
         canReply={true}
         username={post.user.displayName}
         content={post.content}
-        // onReply={}
-        // onEdit={}
-        // onDelete={}
-      />
-      {/* {post.comment.map((comment) => {
-        return <CommentContent />;
-      })} */}
+        onReply={onReply}
+        onDelete={onDelete}
+        onEdit={onEdit}
+      >
+        {comments.length != 0 &&
+          comments.map((comment) => {
+            console.log(comment);
+            return (
+              <CommentContent
+                isAdmin={
+                  session.user.role === "admin" ||
+                  session.user._id === comment.user._id
+                }
+                canReply={false}
+                username={comment.user.displayName}
+                content={comment.content}
+                onReply={onReply}
+                onDelete={onDeleteComment(comment._id)}
+                onEdit={onEditComment(comment._id)}
+              />
+            );
+          })}
+      </CommentContent>
       <Divider />
     </Fragment>
-  );
-};
-
-const PostContent = () => {
-  return (
-    <SimpleBar style={{ maxHeight: 700 }}>
-      <CommentContent
-        canReply={true}
-        username={"John Doe"}
-        content={
-          "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-        }
-      >
-        <CommentContent
-          canReply={false}
-          username={"John Doe"}
-          content={
-            "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-          }
-        />
-        <CommentContent
-          canReply={false}
-          username={"John Doe"}
-          content={
-            "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-          }
-        />
-      </CommentContent>
-      <Divider />
-
-      <CommentContent
-        canReply={true}
-        username={"John Doe"}
-        content={
-          "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-        }
-      >
-        <CommentContent
-          canReply={false}
-          username={"John Doe"}
-          content={
-            "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-          }
-        />
-        <CommentContent
-          canReply={false}
-          username={"John Doe"}
-          content={
-            "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-          }
-        />
-        <CommentContent
-          canReply={false}
-          username={"John Doe"}
-          content={
-            "We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure)."
-          }
-        />
-      </CommentContent>
-    </SimpleBar>
   );
 };
 
@@ -91,10 +111,8 @@ export default ({ session }) => {
   const [create, setCreate] = useState({ content: "" });
 
   useEffect(() => {
-    console.log(session);
     getPostAPI(externalEndpoint)(session.token).then((response) => {
       setPosts(response.data.posts);
-      console.log(response.data.posts);
     });
   }, []);
 
@@ -106,14 +124,18 @@ export default ({ session }) => {
             POSTBOOK.md
           </h1>
           <p>
-            VOS ESTIS "MODERATUR" (MODERATUR, USOR)
+            You are {session.user.role} {session.user.displayName}
             <br />
             <br />
             I. You can "post and comment" on the platform
             <br />
-            II. You can "edit" any posts
+            II. You can "edit" {session.user.role == "user"
+              ? "your"
+              : "every"}{" "}
+            posts
             <br />
-            III. You can "delete" any posts
+            III. You can "delete"{" "}
+            {session.user.role == "user" ? "your" : "every"} posts
             <br />
             <br />© 2020 omne ius per Bankbiz disposito
           </p>
@@ -147,7 +169,7 @@ export default ({ session }) => {
                     getPostAPI(externalEndpoint)(session.token).then(
                       (response) => {
                         setPosts(response.data.posts);
-                        console.log(response.data.posts);
+                        // console.log(response.data.posts);
                       }
                     );
                   });
@@ -179,7 +201,9 @@ export default ({ session }) => {
             </h2>
             <SimpleBar style={{ maxHeight: 700 }}>
               {posts.map((post) => {
-                return <Post post={post} setPosts={setPosts} />;
+                return (
+                  <Post post={post} setPosts={setPosts} session={session} />
+                );
               })}
             </SimpleBar>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Row, Col, Input, Button, Checkbox } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -51,13 +51,10 @@ export default ({ setSession }) => {
 
     loginAPI(externalEndpoint)(userCred)
       .then((response) => {
-        console.log(response);
         const payload = JSON.parse(atob(response.data.token.split(".")[1]));
         const { userId } = payload;
-        console.log(userId);
         getUserAPI(externalEndpoint)(userId)(response.data.token).then(
           (response2) => {
-            console.log(response2);
             setSession({
               authenticated: true,
               user: response2.data.user,
@@ -65,11 +62,6 @@ export default ({ setSession }) => {
             });
           }
         );
-
-        // setSession({
-        //   token: response.data.token,
-
-        // })
       })
       .catch(() => alert("user doesn't exist!"));
   };
@@ -98,12 +90,6 @@ export default ({ setSession }) => {
       .catch(() => alert("user doesn't exist!"));
   };
 
-  useEffect(() => {
-    // console.log(userCred);
-    // console.log(captcha);
-    // console.log(register);
-  });
-
   return (
     <Row id="login-page" className="h-full">
       <Col span={12} className="h-full flex flex-row items-center">
@@ -125,7 +111,6 @@ export default ({ setSession }) => {
               REGISTER
             </h2>
 
-            {/* TO DO Sign in handler */}
             <Input
               size="large"
               placeholder="Enter your username"
@@ -191,7 +176,6 @@ export default ({ setSession }) => {
             SIGN IN
           </h2>
 
-          {/* TO DO Sign in handler */}
           <Input
             size="large"
             placeholder="Enter your username"

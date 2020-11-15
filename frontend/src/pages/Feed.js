@@ -82,11 +82,11 @@ const Post = ({ post, setPosts, session }) => {
         onDelete={onDelete}
         onEdit={onEdit}
       >
-        {comments.length != 0 &&
+        {comments.length !== 0 &&
           comments.map((comment) => {
-            console.log(comment);
             return (
               <CommentContent
+                key={comment._id}
                 isAdmin={
                   session.user.role === "admin" ||
                   session.user._id === comment.user._id
@@ -129,13 +129,13 @@ export default ({ session }) => {
             <br />
             I. You can "post and comment" on the platform
             <br />
-            II. You can "edit" {session.user.role == "user"
+            II. You can "edit" {session.user.role === "user"
               ? "your"
               : "every"}{" "}
             posts
             <br />
             III. You can "delete"{" "}
-            {session.user.role == "user" ? "your" : "every"} posts
+            {session.user.role === "user" ? "your" : "every"} posts
             <br />
             <br />© 2020 omne ius per Bankbiz disposito
           </p>
@@ -157,7 +157,6 @@ export default ({ session }) => {
               POST SCRIBERE
             </h2>
 
-            {/* TO DO Post content handler */}
             <Input
               value={create.content}
               onChange={(e) => {
@@ -169,11 +168,9 @@ export default ({ session }) => {
                     getPostAPI(externalEndpoint)(session.token).then(
                       (response) => {
                         setPosts(response.data.posts);
-                        // console.log(response.data.posts);
                       }
                     );
                   });
-                // alert(create.content);
               }}
               size="large"
               placeholder="Quid autem vobis videtur?"
@@ -202,7 +199,12 @@ export default ({ session }) => {
             <SimpleBar style={{ maxHeight: 700 }}>
               {posts.map((post) => {
                 return (
-                  <Post post={post} setPosts={setPosts} session={session} />
+                  <Post
+                    key={post._id}
+                    post={post}
+                    setPosts={setPosts}
+                    session={session}
+                  />
                 );
               })}
             </SimpleBar>

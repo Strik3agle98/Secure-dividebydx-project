@@ -9,7 +9,7 @@ export interface User {
 }
 
 // for method
-export interface UserDoc extends User, Document { }
+export interface UserDoc extends User, Document {}
 
 const UserSchema = new mongoose.Schema({
   _id: Schema.Types.ObjectId,
@@ -17,8 +17,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
+    select: false,
   },
-  password: String,
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
   displayName: {
     type: String,
     required: true,
@@ -26,6 +31,7 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["admin", "user"],
+    select: false,
   },
 });
 
@@ -44,12 +50,13 @@ const UserSchema = new mongoose.Schema({
 //   next();
 // });
 
-
 UserSchema.statics.findByUsernameAndPassword = async function (
   username: string,
   password: string
 ): Promise<UserDoc | undefined> {
-  const user = await (this as UserModel).findOne({ username });
+  const user = await (this as UserModel)
+    .findOne({ username })
+    .select("password username role");
   if (!user) return undefined;
   const match = await compare(password, user.password);
   if (!match) return undefined;

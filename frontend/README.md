@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Setting up
+
+in the `.env` file add `PORT=4200`
+then run `npm install`
+
+to start run `npm start`
+
 ## Available Scripts
 
 In the project directory, you can run:

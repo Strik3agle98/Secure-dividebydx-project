@@ -18,9 +18,10 @@ const Post = ({ post, setPosts }) => {
         // onEdit={}
         // onDelete={}
       />
-      {post.comment.map((comment) => {
+      {/* {post.comment.map((comment) => {
         return <CommentContent />;
-      })}
+      })} */}
+      <Divider />
     </Fragment>
   );
 };
@@ -87,6 +88,7 @@ const PostContent = () => {
 
 export default ({ session }) => {
   const [posts, setPosts] = useState([]);
+  const [create, setCreate] = useState({ content: "" });
 
   useEffect(() => {
     console.log(session);
@@ -135,6 +137,22 @@ export default ({ session }) => {
 
             {/* TO DO Post content handler */}
             <Input
+              value={create.content}
+              onChange={(e) => {
+                setCreate({ content: e.target.value });
+              }}
+              onPressEnter={(e) => {
+                create &&
+                  postAPI(externalEndpoint)(create)(session.token).then(() => {
+                    getPostAPI(externalEndpoint)(session.token).then(
+                      (response) => {
+                        setPosts(response.data.posts);
+                        console.log(response.data.posts);
+                      }
+                    );
+                  });
+                // alert(create.content);
+              }}
               size="large"
               placeholder="Quid autem vobis videtur?"
               prefix={<FontSizeOutlined />}
@@ -159,7 +177,11 @@ export default ({ session }) => {
             >
               RESTINCTIO
             </h2>
-            <PostContent />
+            <SimpleBar style={{ maxHeight: 700 }}>
+              {posts.map((post) => {
+                return <Post post={post} setPosts={setPosts} />;
+              })}
+            </SimpleBar>
           </div>
         </div>
       </Col>

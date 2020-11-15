@@ -76,7 +76,7 @@ export default ({ setSession }) => {
 
   const handleRegister = () => {
     const passw = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,100}$/;
-    if (userCred.username.length === 0 || userCred.password.length === 0) {
+    if (!register.username || !register.password || !register.displayName) {
       alert("Form can't be empty");
       return;
     }
@@ -84,7 +84,7 @@ export default ({ setSession }) => {
       alert("captcha not done");
       return;
     }
-    if (!userCred.password.match(passw)) {
+    if (!register.password.match(passw)) {
       alert(
         "password must contain capital letter, normal letter, number and longer than 8 characters."
       );

@@ -18,5 +18,7 @@ export const getPostAPI = (APIlocation) => (token) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const postAPI = (APIlocation) => (post) =>
-  Axios.post(`${APIlocation}/posts/`, post);
+export const postAPI = (APIlocation) => (post) => (token) =>
+  Axios.post(`${APIlocation}/api/post/`, post, {
+    headers: { Authorization: `Bearer ${token}` },
+  });

@@ -4,7 +4,11 @@ import jwt from "jsonwebtoken";
 import config from "../config/config";
 import PostDb, { PopulatedPostDoc, PostDoc, Post } from "../models/post";
 import Mongoose, { Types } from "mongoose";
-import CommentDb, { CommentDoc, Comment, PopulatedCommentDoc } from "../models/comment";
+import CommentDb, {
+  CommentDoc,
+  Comment,
+  PopulatedCommentDoc,
+} from "../models/comment";
 import { hash } from "bcrypt";
 // Auth
 export class LoginUseCase {
@@ -53,7 +57,7 @@ export class RegisterUseCase {
 // User
 export class GetUserByIdUseCase {
   static async execute(userId: string): Promise<UserDoc> {
-    const user = await UserDb.findOne({_id: userId}, {password: 0});
+    const user = await UserDb.findOne({ _id: userId }).select("+role");
     if (!user) throw new Error("User not found");
 
     return user.toObject();
@@ -63,19 +67,37 @@ export class GetUserByIdUseCase {
 // Post
 export class GetPostByIdUseCase {
   static async execute(postId: string): Promise<PopulatedPostDoc | undefined> {
-    const result = (await PostDb.findById(postId).populate('user').populate('comments'));
+    const result = await PostDb.findById(postId)
+      .populate("user")
+      .populate("comments")
+      .populate({
+        path: "comments",
+        populate: { path: "user" },
+        select: "-_id -__v",
+      });
     return result ?? undefined;
   }
 }
 
 export class GetAllPostsUseCase {
   static async execute() {
-    return await PostDb.find().populate('user').populate('comments');
+    const posts = await PostDb.find()
+      .populate("user")
+      .populate("comments")
+      .populate({
+        path: "comments",
+        populate: { path: "user" },
+        select: "-_id -__v",
+      });
+    return posts;
   }
 }
 
 export class CreatePostUseCase {
-  static async execute(content: string, userId: string): Promise<PopulatedPostDoc> {
+  static async execute(
+    content: string,
+    userId: string
+  ): Promise<PopulatedPostDoc> {
     const newPost: Post = {
       content,
       user: new Mongoose.Types.ObjectId(userId),
@@ -83,7 +105,7 @@ export class CreatePostUseCase {
       comments: [],
     };
     const post = (await PostDb.insertMany([newPost]))[0];
-    return await post.populate('user').populate('comments');
+    return await post.populate("user").populate("comments");
   }
 }
 
@@ -112,10 +134,10 @@ export class ValidatePostPermissionUsecase {
     // same user = ok
     if (post.user.toString() == userId) return true;
     // else check admin
-    const user = await UserDb.findById(userId);
+    const user = await UserDb.findById(userId).select("+role");
     if (!user) throw new Error("invalid User");
     console.log("[validate.user]", user._id, user.role);
-    console.log("result", user.role === 'admin')
+    console.log("result", user.role === "admin");
     return user.role === "admin";
   }
 }
@@ -123,7 +145,7 @@ export class ValidatePostPermissionUsecase {
 // comment
 export class GetPostCommentsUseCase {
   static async execute(postId: string): Promise<PopulatedCommentDoc[]> {
-    const comments = await CommentDb.find({ post: postId }).populate('user');
+    const comments = await CommentDb.find({ post: postId }).populate("user");
     return comments;
   }
 }
@@ -184,13 +206,13 @@ export class DeleteCommentUsecase {
 
 export class ValidateCommentPermissionUseCase {
   static async execute(commentId: string, userId: string) {
-    console.log({commentId, userId})
+    console.log({ commentId, userId });
     const comment = await CommentDb.findById(commentId);
     if (!comment) throw new Error("invalid Comment");
     // same user = ok
     if (comment.user.toString() == userId) return true;
     // else check admin
-    const user = await UserDb.findById(userId);
+    const user = await UserDb.findById(userId).select("+role");
     if (!user) throw new Error("invalid User");
     return user.role === "admin";
   }

@@ -70,7 +70,11 @@ export class GetPostByIdUseCase {
     const result = await PostDb.findById(postId)
       .populate("user")
       .populate("comments")
-      .populate("comments.user");
+      .populate({
+        path: "comments",
+        populate: { path: "user" },
+        select: "-_id -__v",
+      });
     return result ?? undefined;
   }
 }

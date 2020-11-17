@@ -1,0 +1,8 @@
+dist/
+node_modules/
+.gitignore
+.prettierrc.json
+docker-compose.yml
+Dockerfile
+yarn-error.log
+.env

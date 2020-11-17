@@ -10,13 +10,13 @@
 // please change post id
 @post1= 5fb116a54353ae36539bb9b3
 @post2= 5fafb6f137abec5fc02f8ab4
+@host=http://localhost:4000
+###
+{{host}}
 
 ###
-http://localhost:3000
 
-###
-
-POST http://localhost:3000/api/login
+POST {{host}}/api/login
 Content-Type: {{ctype}}
 
 {
@@ -25,7 +25,7 @@ Content-Type: {{ctype}}
 }
 
 ###
-POST http://localhost:3000/api/dev/register
+POST {{host}}/api/dev/register
 Content-Type: {{ctype}}
 
 {
@@ -36,26 +36,26 @@ Content-Type: {{ctype}}
 }
 
 ###
-GET http://localhost:3000/api/user/5fafae211a05b949b70f57c1
+GET {{host}}/api/user/5fafae211a05b949b70f57c1
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
 
 
 ###
-GET http://localhost:3000/api/post
+GET {{host}}/api/post
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
 
 ###
-GET http://localhost:3000/api/post/{{post1}}
+GET {{host}}/api/post/{{post1}}
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
 
 ###
-POST http://localhost:3000/api/post
+POST {{host}}/api/post
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
@@ -64,7 +64,7 @@ Authorization: Bearer {{token}}
 }
 
 ###
-POST http://localhost:3000/api/post/{{post1}}
+POST {{host}}/api/post/{{post1}}
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
@@ -74,20 +74,20 @@ Authorization: Bearer {{token}}
 
 
 ###
-DELETE http://localhost:3000/api/post/{{post1}}
+DELETE {{host}}/api/post/{{post1}}
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
 
 
 ###
-GET http://localhost:3000/api/post/{{post1}}/comment
+GET {{host}}/api/post/{{post1}}/comment
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
 
 ###
-POST http://localhost:3000/api/post/{{post1}}/comment
+POST {{host}}/api/post/{{post1}}/comment
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
@@ -102,7 +102,7 @@ Authorization: Bearer {{token}}
 @commentuser = 5fafbc3d21756b65f1d705be
 
 ###
-POST http://localhost:3000/api/comment/{{commentadmin}}
+POST {{host}}/api/comment/{{commentadmin}}
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 
@@ -112,7 +112,7 @@ Authorization: Bearer {{token}}
 
 
 ###
-DELETE http://localhost:3000/api/comment/{{commentadmin}}
+DELETE {{host}}/api/comment/{{commentadmin}}
 Content-Type: {{ctype}}
 Authorization: Bearer {{token}}
 

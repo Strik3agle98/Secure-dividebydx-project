@@ -1,7 +1,11 @@
 version: "3"
 services:
   backend:
-    image: secure-project-backend
+    image: rod41732/secure-project-backend
+    ### if you prefer to build yourself
+    # build:
+    #   context: backend
+
     environment:
       - PORT=4000
       - MONGODB_URI=mongodb://mongo:27017/test
@@ -11,7 +15,11 @@ services:
   mongo:
     image: mongo
   frontend:
-    image: secure-project-frontend
+    image: rod41732/secure-project-frontend
+    ### if you prefer to build yourself
+    # build:
+    #   context: frontend
+
   nginx:
     image: nginx
     volumes:

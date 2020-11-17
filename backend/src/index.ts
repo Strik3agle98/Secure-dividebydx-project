@@ -1,12 +1,12 @@
-import express from "express";
-import bodyParser from "body-parser";
-import logger from "morgan";
-import cors from "cors";
-import cookieParser from "cookie-parser";
+import express from 'express';
+import bodyParser from 'body-parser';
+import logger from 'morgan';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
-const mongoose = require("mongoose");
-import rootRouter from "./routes/api";
-import config from "./config/config";
+const mongoose = require('mongoose');
+import rootRouter from './routes/api';
+import config from './config/config';
 
 const app = express();
 
@@ -19,18 +19,24 @@ mongoose
 
 mongoose.Promise = global.Promise;
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(cors({ origin: "http://localhost:4200", credentials: true }));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      console.log(origin);
+      callback(null, true);
+    },
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
-app.use("/api", rootRouter);
+app.use('/api', rootRouter);
 
 app.use((err: any, req: any, res: any, next: any) => {
   console.log(err);
   next();
 });
 
-app.listen(config.NODE_PORT, () =>
-  console.log(`app started at port ${config.NODE_PORT}!`)
-);
+app.listen(config.NODE_PORT, () => console.log(`app started at port ${config.NODE_PORT}!`));

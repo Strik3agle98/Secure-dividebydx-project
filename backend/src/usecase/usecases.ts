@@ -1,20 +1,16 @@
-import { JsonWebTokenError } from "jsonwebtoken";
-import UserDb, { User, UserDoc, UserModel } from "../models/user";
-import jwt from "jsonwebtoken";
-import config from "../config/config";
-import PostDb, { PopulatedPostDoc, PostDoc, Post } from "../models/post";
-import Mongoose, { Types } from "mongoose";
-import CommentDb, {
-  CommentDoc,
-  Comment,
-  PopulatedCommentDoc,
-} from "../models/comment";
-import { hash } from "bcrypt";
+import { JsonWebTokenError } from 'jsonwebtoken';
+import UserDb, { User, UserDoc, UserModel } from '../models/user';
+import jwt from 'jsonwebtoken';
+import config from '../config/config';
+import PostDb, { PopulatedPostDoc, PostDoc, Post } from '../models/post';
+import Mongoose, { Types } from 'mongoose';
+import CommentDb, { CommentDoc, Comment, PopulatedCommentDoc } from '../models/comment';
+import { hash } from 'bcrypt';
 // Auth
 export class LoginUseCase {
   static async execute(username: string, password: string): Promise<UserDoc> {
     const user = await UserDb.findByUsernameAndPassword(username, password);
-    if (!user) throw new Error("User found");
+    if (!user) throw new Error('User found');
     return user;
   }
 }
@@ -34,14 +30,14 @@ export class SignJwtUseCase {
 
 interface JwtResult {
   userId: string;
-  role: "admin" | "user";
+  role: 'admin' | 'user';
 }
 
 export class VerifyJwtUseCase {
   static execute(token: string): JwtResult {
     const result = jwt.verify(token, config.JWT_SECRET);
     const { userId, role } = result as any;
-    if (!userId || !role) throw new Error("Invalid JWT");
+    if (!userId || !role) throw new Error('Invalid JWT');
     return { userId, role };
   }
 }
@@ -50,6 +46,8 @@ export class RegisterUseCase {
   static async execute(user: User): Promise<void> {
     // TODO: actually this should validate ?
     user.password = await hash(user.password, 8);
+    const extUser = await UserDb.findOne({ username: user.username });
+    if (extUser) throw new Error('Already exists');
     await UserDb.insertMany(user);
     return;
   }
@@ -57,8 +55,8 @@ export class RegisterUseCase {
 // User
 export class GetUserByIdUseCase {
   static async execute(userId: string): Promise<UserDoc> {
-    const user = await UserDb.findOne({ _id: userId }).select("+role");
-    if (!user) throw new Error("User not found");
+    const user = await UserDb.findOne({ _id: userId }).select('+role');
+    if (!user) throw new Error('User not found');
 
     return user.toObject();
   }
@@ -68,12 +66,12 @@ export class GetUserByIdUseCase {
 export class GetPostByIdUseCase {
   static async execute(postId: string): Promise<PopulatedPostDoc | undefined> {
     const result = await PostDb.findById(postId)
-      .populate("user")
-      .populate("comments")
+      .populate('user')
+      .populate('comments')
       .populate({
-        path: "comments",
-        populate: { path: "user" },
-        select: "-_id -__v",
+        path: 'comments',
+        populate: { path: 'user' },
+        select: '-_id -__v',
       });
     return result ?? undefined;
   }
@@ -82,22 +80,19 @@ export class GetPostByIdUseCase {
 export class GetAllPostsUseCase {
   static async execute() {
     const posts = await PostDb.find()
-      .populate("user")
-      .populate("comments")
+      .populate('user')
+      .populate('comments')
       .populate({
-        path: "comments",
-        populate: { path: "user" },
-        select: "-_id -__v",
+        path: 'comments',
+        populate: { path: 'user' },
+        select: '-_id -__v',
       });
     return posts;
   }
 }
 
 export class CreatePostUseCase {
-  static async execute(
-    content: string,
-    userId: string
-  ): Promise<PopulatedPostDoc> {
+  static async execute(content: string, userId: string): Promise<PopulatedPostDoc> {
     const newPost: Post = {
       content,
       user: new Mongoose.Types.ObjectId(userId),
@@ -105,14 +100,14 @@ export class CreatePostUseCase {
       comments: [],
     };
     const post = (await PostDb.insertMany([newPost]))[0];
-    return await post.populate("user").populate("comments");
+    return await post.populate('user').populate('comments');
   }
 }
 
 export class EditPostUsecase {
   static async execute(postId: string, newContent: string): Promise<void> {
     const oldPost = await PostDb.findById(postId);
-    if (!oldPost) throw new Error("Post not found");
+    if (!oldPost) throw new Error('Post not found');
     oldPost.content = newContent;
     oldPost.timestamp = new Date();
     await oldPost.save();
@@ -129,35 +124,31 @@ export class DeletePostUsecase {
 export class ValidatePostPermissionUsecase {
   static async execute(postId: string, userId: string) {
     const post = await PostDb.findById(postId);
-    if (!post) throw new Error("invalid Post");
-    console.log("[validate.post]", post._id);
+    if (!post) throw new Error('invalid Post');
+    console.log('[validate.post]', post._id);
     // same user = ok
     if (post.user.toString() == userId) return true;
     // else check admin
-    const user = await UserDb.findById(userId).select("+role");
-    if (!user) throw new Error("invalid User");
-    console.log("[validate.user]", user._id, user.role);
-    console.log("result", user.role === "admin");
-    return user.role === "admin";
+    const user = await UserDb.findById(userId).select('+role');
+    if (!user) throw new Error('invalid User');
+    console.log('[validate.user]', user._id, user.role);
+    console.log('result', user.role === 'admin');
+    return user.role === 'admin';
   }
 }
 
 // comment
 export class GetPostCommentsUseCase {
   static async execute(postId: string): Promise<PopulatedCommentDoc[]> {
-    const comments = await CommentDb.find({ post: postId }).populate("user");
+    const comments = await CommentDb.find({ post: postId }).populate('user');
     return comments;
   }
 }
 
 export class AddCommentToPostUseCase {
-  static async execute(
-    postId: string,
-    userId: string,
-    content: string
-  ): Promise<CommentDoc> {
+  static async execute(postId: string, userId: string, content: string): Promise<CommentDoc> {
     const post = await PostDb.findById(postId);
-    if (!post) throw new Error("Post not found");
+    if (!post) throw new Error('Post not found');
 
     const newComment: Partial<Comment> = {
       post: new Mongoose.Types.ObjectId(postId),
@@ -177,7 +168,7 @@ export class AddCommentToPostUseCase {
 export class EditCommentUsecase {
   static async execute(commentId: string, newContent: string): Promise<void> {
     const oldComment = await CommentDb.findById(commentId);
-    if (!oldComment) throw new Error("Comment not found");
+    if (!oldComment) throw new Error('Comment not found');
     oldComment.content = newContent;
     // dont update time cause dont wanna break comment order
     await oldComment.save();
@@ -191,10 +182,10 @@ export class DeleteCommentUsecase {
     }
 
     const post = (await PostDb.findById(deletedComment.post)) as PostDoc;
-    console.log("comments", post.comments);
+    console.log('comments', post.comments);
 
     const idx = post.comments.findIndex((cid) => cid === commentId);
-    if (!idx) throw new Error("Inconsistency found in DB");
+    if (!idx) throw new Error('Inconsistency found in DB');
     const newComments = [...post.comments];
     newComments.splice(idx, 1);
     post.comments = newComments;
@@ -208,12 +199,12 @@ export class ValidateCommentPermissionUseCase {
   static async execute(commentId: string, userId: string) {
     console.log({ commentId, userId });
     const comment = await CommentDb.findById(commentId);
-    if (!comment) throw new Error("invalid Comment");
+    if (!comment) throw new Error('invalid Comment');
     // same user = ok
     if (comment.user.toString() == userId) return true;
     // else check admin
-    const user = await UserDb.findById(userId).select("+role");
-    if (!user) throw new Error("invalid User");
-    return user.role === "admin";
+    const user = await UserDb.findById(userId).select('+role');
+    if (!user) throw new Error('invalid User');
+    return user.role === 'admin';
   }
 }

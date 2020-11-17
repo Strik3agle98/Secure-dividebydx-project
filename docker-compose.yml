@@ -1,0 +1,23 @@
+version: "3"
+services:
+  backend:
+    image: secure-project-backend
+    environment:
+      - PORT=4000
+      - MONGODB_URI=mongodb://mongo:27017/test
+      - JWT_SECRET=8709b427fab387938033774cadcf9300
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+  frontend:
+    image: secure-project-frontend
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx-config.conf:/etc/nginx/conf.d/nginx-config.conf:ro
+    ports:
+      - 8000:8000
+    depends_on:
+      - backend
+      - frontend

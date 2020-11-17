@@ -39,4 +39,4 @@ app.use((err: any, req: any, res: any, next: any) => {
   next();
 });
 
-app.listen(config.NODE_PORT, () => console.log(`app started at port ${config.NODE_PORT}!`));
+app.listen(config.PORT, () => console.log(`app started at port ${config.PORT}!`));

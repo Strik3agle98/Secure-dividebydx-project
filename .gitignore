@@ -105,4 +105,10 @@ dist
 
 # TernJS port file
 .tern-port
+<<<<<<< Updated upstream
 mongo-data
+=======
+
+# MongoDB data (when run docker)
+mongo-data/
+>>>>>>> Stashed changes

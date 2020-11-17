@@ -27,3 +27,5 @@ image: rod41732/secure-project-frontend
 # build:
 #   context: frontend
 ```
+
+after running access the app on `localhost:8000`

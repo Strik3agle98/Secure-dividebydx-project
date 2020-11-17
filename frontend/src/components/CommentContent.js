@@ -20,55 +20,62 @@ export default function CommentContent({
   username,
   content,
   canReply,
+  onReply,
+  onDelete,
+  onEdit,
+  isAdmin,
 }) {
   const [showModalAddComment, setShowModalAddComment] = useState(false);
   const [showModalEditComment, setShowModalEditComment] = useState(false);
+  const [comment, setComment] = useState({ content: "" });
+  const [edit, setEdit] = useState({ content: "" });
   const [randomColor, setRandomColor] = useState(
     ColorList[Math.floor(Math.random() * ColorList.length)]
   );
 
-  const onAddCommentConfirm = (e) => {
-    //TO DO Delete content
-  };
-
-  const onEditContentConfirm = (e) => {
-    //TO DO Edit content
-  };
-
-  const onDeleteConfirm = (e) => {
-    console.log(e);
-    message.success("Delete content successful!");
-    //TO DO Delete content
-  };
-
   return (
     <Comment
-      actions={[
-        <>
-          {canReply && (
-            <span
-              className="text-gray-500"
-              onClick={() => setShowModalAddComment(true)}
-            >
-              Reply to
-            </span>
-          )}
-        </>,
-        <span
-          className="text-gray-500"
-          onClick={() => setShowModalEditComment(true)}
-        >
-          Edit
-        </span>,
-        <Popconfirm
-          title="Are you sure delete this content?"
-          onConfirm={onDeleteConfirm}
-          okText="Yes"
-          cancelText="No"
-        >
-          <span className="text-gray-500">Delete</span>
-        </Popconfirm>,
-      ]}
+      actions={
+        isAdmin
+          ? [
+              <>
+                {canReply && (
+                  <span
+                    className="text-gray-500"
+                    onClick={() => setShowModalAddComment(true)}
+                  >
+                    Reply to
+                  </span>
+                )}
+              </>,
+              <span
+                className="text-gray-500"
+                onClick={() => setShowModalEditComment(true)}
+              >
+                Edit
+              </span>,
+              <Popconfirm
+                title="Are you sure delete this content?"
+                onConfirm={onDelete}
+                okText="Yes"
+                cancelText="No"
+              >
+                <span className="text-gray-500">Delete</span>
+              </Popconfirm>,
+            ]
+          : [
+              <>
+                {canReply && (
+                  <span
+                    className="text-gray-500"
+                    onClick={() => setShowModalAddComment(true)}
+                  >
+                    Reply to
+                  </span>
+                )}
+              </>,
+            ]
+      }
       author={<h4 className="text-lg">{username}</h4>}
       avatar={
         <Avatar
@@ -77,7 +84,7 @@ export default function CommentContent({
           }}
           size="large"
         >
-          {username[0]}
+          {username ? username[0] : "N"}
         </Avatar>
       }
       content={<p style={{ color: "rgba(255, 255, 255, 0.7)" }}>{content}</p>}
@@ -87,21 +94,32 @@ export default function CommentContent({
       <Modal
         title="ADD COMMENT"
         visible={showModalAddComment}
-        onOk={onAddCommentConfirm}
+        onOk={onReply(comment, setShowModalAddComment)}
         onCancel={() => setShowModalAddComment(false)}
         closable={false}
       >
-        <Input size="large" placeholder="Add your comment to this post..." />
+        <Input
+          value={comment.content}
+          onChange={(e) => {
+            setComment({ content: e.target.value });
+          }}
+          size="large"
+          placeholder="Add your comment to this post..."
+        />
       </Modal>
 
       <Modal
         title="EDIT COMMENT"
         visible={showModalEditComment}
-        onOk={onEditContentConfirm}
+        onOk={onEdit(edit, setShowModalEditComment)}
         onCancel={() => setShowModalEditComment(false)}
         closable={false}
       >
         <Input
+          value={edit.content}
+          onChange={(e) => {
+            setEdit({ content: e.target.value });
+          }}
           size="large"
           placeholder="Edit this post content..."
           defaultValue={content}

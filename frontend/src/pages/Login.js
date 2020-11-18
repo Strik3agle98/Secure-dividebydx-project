@@ -132,6 +132,7 @@ export default ({ setSession }) => {
               className="mb-3"
               onChange={onChangeReg("displayName")}
             />
+
             <Checkbox
               style={{ color: "rgb(255 255 255 / 40%)" }}
               value={checked}
@@ -150,6 +151,7 @@ export default ({ setSession }) => {
             >
               Register as Admin ?
             </Checkbox>
+            <div className="mb-6"></div>
             <ReCAPTCHA
               sitekey="6LcqAeIZAAAAAIcklWRbpT0gp6SqWdE_6y7shLxp"
               onChange={onChange("captcha")}
@@ -190,18 +192,21 @@ export default ({ setSession }) => {
             className="mb-3"
             onChange={onChange("password")}
           />
+          <div className="flex" style={{ color: "rgb(255 255 255 / 40%)" }}>
+            <p className="mr-auto">Do you forget a password?</p>
+            <p>Nothing to do here</p>
+          </div>
+          <div className="mb-6"></div>
           <ReCAPTCHA
             sitekey="6LcqAeIZAAAAAIcklWRbpT0gp6SqWdE_6y7shLxp"
             onChange={onChange("captcha")}
           />
-          <div
-            className="flex mb-16"
-            style={{ color: "rgb(255 255 255 / 40%)" }}
+          <Button
+            className="mt-16"
+            size="large"
+            htmlType="submit"
+            onClick={handleSubmit}
           >
-            <p className="mr-auto">Do you forget a password?</p>
-            <p>Nothing to do here</p>
-          </div>
-          <Button size="large" htmlType="submit" onClick={handleSubmit}>
             SIGN IN
           </Button>
         </div>

@@ -118,7 +118,7 @@ export default ({ setSession }) => {
               className="mb-12"
               onChange={onChangeReg("username")}
             />
-            <Input
+            <Input.Password
               size="large"
               placeholder="Enter your password"
               prefix={<LockOutlined />}
@@ -183,7 +183,7 @@ export default ({ setSession }) => {
             className="mb-12"
             onChange={onChange("username")}
           />
-          <Input
+          <Input.Password
             size="large"
             placeholder="Enter your password"
             prefix={<LockOutlined />}

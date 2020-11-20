@@ -1,10 +1,10 @@
 version: "3"
 services:
   backend:
-    image: rod41732/secure-project-backend
+    # image: rod41732/secure-project-backend
     ### if you prefer to build yourself
-    # build:
-    #   context: backend
+    build:
+      context: backend
 
     environment:
       - PORT=4000
@@ -15,10 +15,10 @@ services:
   mongo:
     image: mongo
   frontend:
-    image: rod41732/secure-project-frontend
+    # image: rod41732/secure-project-frontend
     ### if you prefer to build yourself
-    # build:
-    #   context: frontend
+    build:
+      context: frontend
 
   nginx:
     image: nginx

@@ -2,7 +2,7 @@ version: "3"
 services:
   backend:
     image: rod41732/secure-project-backend
-    ### if you prefer to build yourself
+    ## if you prefer to build yourself
     # build:
     #   context: backend
 
@@ -16,7 +16,7 @@ services:
     image: mongo
   frontend:
     image: rod41732/secure-project-frontend
-    ### if you prefer to build yourself
+    ## if you prefer to build yourself
     # build:
     #   context: frontend
 
